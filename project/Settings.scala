@@ -171,6 +171,7 @@ object Settings {
   )
 
   def aRootProjectSettings = (
+    skip in publish := true,
     slickGeneralSettings ++
       extTarget("root") ++
 //      Docs.docSettings ++
