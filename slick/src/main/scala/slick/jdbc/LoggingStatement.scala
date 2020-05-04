@@ -46,7 +46,8 @@ class LoggingStatement(st: Statement) extends Statement {
   }
 
   protected[this] def logged[T](sql: String, what: String = "statement")(f: =>T) = {
-    if(doStatement && (sql ne null)) JdbcBackend.statementLogger.debug("Executing "+what+": "+sql)
+    val logTag = System.nanoTime().toString
+    if(doStatement && (sql ne null)) JdbcBackend.statementLogger.debug("["+logTag+"] Executing "+what+": "+sql)
     if(doStatementAndParameter && (sql ne null)) JdbcBackend.statementAndParameterLogger.debug("Executing "+what+": "+sql)
     if(doParameter && (paramss ne null) && paramss.nonEmpty) {
       // like s.groupBy but only group adjacent elements and keep the ordering
@@ -85,7 +86,7 @@ class LoggingStatement(st: Statement) extends Statement {
     }
     val t0 = if(doBenchmark) System.nanoTime() else 0L
     val res = f
-    if(doBenchmark) JdbcBackend.benchmarkLogger.debug("Execution of "+what+" took "+formatNS(System.nanoTime()-t0))
+    if(doBenchmark) JdbcBackend.benchmarkLogger.debug("["+logTag+"] Execution of "+what+" took "+formatNS(System.nanoTime()-t0))
     clearParamss
     res
   }
