@@ -2,7 +2,7 @@ import Settings._
 import Docs.docDir
 import BuildUtils._
 
-ThisBuild / version := "3.3.3-cc1"
+ThisBuild / version := "3.3.3-cc2"
 ThisBuild / bintrayOrganization := Some("coreconsult")
 
 // Slick base version for binary compatibility checks.
