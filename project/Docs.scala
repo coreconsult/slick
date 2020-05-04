@@ -1,6 +1,6 @@
 import sbt._
 import Keys._
-import com.typesafe.sbt.sdlc.SDLCPlugin.autoImport.{sdlc, sdlcBase, sdlcCheckDir}
+// import com.typesafe.sbt.sdlc.SDLCPlugin.autoImport.{sdlc, sdlcBase, sdlcCheckDir}
 import com.novocode.ornate.sbtplugin.OrnatePlugin.autoImport.{ornateBaseDir, ornateSourceDir, ornateTargetDir, ornateResourceDir, ornateSettings, ornate}
 
 object Docs {
@@ -27,10 +27,10 @@ object Docs {
     ornate :=
       (ornate dependsOn (LocalProject("testkit") / buildCapabilitiesTable)).value,
     doc / aggregate := true,
-    sdlc / aggregate := true,
+//    sdlc / aggregate := true,
     doc := ornate.value
   )
-
+/*
   def scaladocSettings = Seq(
     sdlcBase := apiName(projectID.value.name),
     sdlcCheckDir := docDir.value / "target",
@@ -38,6 +38,6 @@ object Docs {
     sdlc :=
       (sdlc dependsOn (Compile / doc)).value
   )
-
+*/
   def apiName(projectId: String) = (projectId + "-api/").replaceFirst("^slick-", "")
 }

@@ -1,6 +1,7 @@
 import sbt._
 import sbt.nio.Keys.fileTreeView
 import Keys._
+import bintray.BintrayKeys._
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.core.{DirectMissingMethodProblem, IncompatibleMethTypeProblem, MissingClassProblem, ProblemFilters, ReversedMissingMethodProblem}
 import com.typesafe.tools.mima.plugin.MimaKeys.{mimaBinaryIssueFilters, mimaPreviousArtifacts}
@@ -34,16 +35,16 @@ object Settings {
       FMPP.preprocessorSettings ++
       mimaDefaultSettings ++
       extTarget("slick") ++
-      Docs.scaladocSettings ++
+//      Docs.scaladocSettings ++
       osgiSettings ++
       Seq(
         name := "Slick",
         description := "Scala Language-Integrated Connection Kit",
         libraryDependencies ++= Dependencies.mainDependencies,
-        Compile / doc / scalacOptions ++= Seq(
-          "-doc-source-url", s"https://github.com/slick/slick/blob/${Docs.versionTag(version.value)}/slick/src/main€{FILE_PATH}.scala",
-          "-doc-root-content", "scaladoc-root.txt"
-        ),
+//        Compile / doc / scalacOptions ++= Seq(
+//         "-doc-source-url", s"https://github.com/slick/slick/blob/${Docs.versionTag(version.value)}/slick/src/main€{FILE_PATH}.scala",
+//          "-doc-root-content", "scaladoc-root.txt"
+//        ),
         test := {}, testOnly :=  {}, // suppress test status output
         mimaPreviousArtifacts := binaryCompatSlickVersion.value.toSet.map { v: String =>
           "com.typesafe.slick" % ("slick_" + scalaBinaryVersion.value) % v
@@ -86,16 +87,16 @@ object Settings {
   def slickTestkitProjectSettings = (
     slickGeneralSettings ++
       compilerDependencySetting("provided") ++
-      inConfig(DocTest)(Defaults.testSettings) ++
-      Docs.scaladocSettings ++
+//      inConfig(DocTest)(Defaults.testSettings) ++
+//      Docs.scaladocSettings ++
       TypeProviders.codegenSettings ++
       extTarget("testkit") ++
       Seq(
         name := "Slick-TestKit",
         description := "Test Kit for Slick (Scala Language-Integrated Connection Kit)",
-        Compile / doc / scalacOptions ++= Seq(
-          "-doc-source-url", s"https://github.com/slick/slick/blob/${Docs.versionTag(version.value)}/slick-testkit/src/main€{FILE_PATH}.scala"
-        ),
+//        Compile / doc / scalacOptions ++= Seq(
+//          "-doc-source-url", s"https://github.com/slick/slick/blob/${Docs.versionTag(version.value)}/slick-testkit/src/main€{FILE_PATH}.scala"
+//        ),
         testOptions += Tests.Argument(TestFrameworks.JUnit, "-q", "-v", "-s", "-a", "-Djava.awt.headless=true"),
         //scalacOptions in Compile += "-Yreify-copypaste",
         libraryDependencies ++=
@@ -119,28 +120,28 @@ object Settings {
           IO.delete(products)
         },
         (Test / cleanCompileTimeTests) := ((Test / cleanCompileTimeTests) triggeredBy (Test / compile)).value,
-        Docs.buildCapabilitiesTable := {
-          val logger = ConsoleLogger()
-          Run.run( "com.typesafe.slick.testkit.util.BuildCapabilitiesTable",
-                   (Compile / fullClasspath).value.map(_.data),
-                   Seq(Docs.docDir.value / "capabilities.md") map (_.toString),
-                   logger)(runner.value)
-        },
-        DocTest / unmanagedSourceDirectories += Docs.docDir.value / "code",
-        DocTest / unmanagedResourceDirectories += Docs.docDir.value / "code"
+//        Docs.buildCapabilitiesTable := {
+//          val logger = ConsoleLogger()
+//          Run.run( "com.typesafe.slick.testkit.util.BuildCapabilitiesTable",
+//                   (Compile / fullClasspath).value.map(_.data),
+//                   Seq(Docs.docDir.value / "capabilities.md") map (_.toString),
+//                   logger)(runner.value)
+//        },
+//        DocTest / unmanagedSourceDirectories += Docs.docDir.value / "code",
+//        DocTest / unmanagedResourceDirectories += Docs.docDir.value / "code"
       )
   )
 
   def slickCodegenProjectSettings = (
     slickGeneralSettings ++
       extTarget("codegen") ++
-      Docs.scaladocSettings ++
+//      Docs.scaladocSettings ++
       Seq(
         name := "Slick-CodeGen",
         description := "Code Generator for Slick (Scala Language-Integrated Connection Kit)",
-        Compile / doc / scalacOptions ++= Seq(
-          "-doc-source-url", s"https://github.com/slick/slick/blob/${Docs.versionTag(version.value)}/slick-codegen/src/main€{FILE_PATH}.scala"
-        ),
+//        Compile / doc / scalacOptions ++= Seq(
+//          "-doc-source-url", s"https://github.com/slick/slick/blob/${Docs.versionTag(version.value)}/slick-codegen/src/main€{FILE_PATH}.scala"
+//        ),
         test := {}, testOnly := {}, // suppress test status output
         commonTestResourcesSetting
       )
@@ -149,7 +150,7 @@ object Settings {
   def slickHikariCPProjectSettings = (
     slickGeneralSettings ++
       extTarget("hikaricp") ++
-      Docs.scaladocSettings ++
+//      Docs.scaladocSettings ++
       osgiSettings ++
       Seq(
         name := "Slick-HikariCP",
@@ -172,7 +173,7 @@ object Settings {
   def aRootProjectSettings = (
     slickGeneralSettings ++
       extTarget("root") ++
-      Docs.docSettings ++
+//      Docs.docSettings ++
       Seq(
         sourceDirectory := file(target.value + "/root-src"),
         publishArtifact := false,
@@ -245,19 +246,13 @@ object Settings {
     organization := "com.typesafe.slick",
     resolvers += Resolver.sonatypeRepo("snapshots"),
     repoKind := (if (version.value.trim.endsWith("SNAPSHOT")) "snapshots" else "releases"),
-    publishTo := (
-      repoKind.value match {
-        case "snapshots" => Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots")
-        case "releases" =>  Some("releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
-      }
-    ),
     publishMavenStyle := true,
     Test / publishArtifact := false,
     pomIncludeRepository := { _ => false },
     makePomConfiguration ~= { _.withConfigurations(Vector(Compile, Runtime, Optional)) },
     homepage := Some(url("http://slick.typesafe.com")),
     startYear := Some(2008),
-    licenses += ("Two-clause BSD-style license", url("http://github.com/slick/slick/blob/master/LICENSE.txt")),
+    licenses += ("BSD 2-Clause", url("http://github.com/slick/slick/blob/master/LICENSE.txt")),
     pomExtra := pomExtraXml
   )
 
@@ -284,16 +279,16 @@ object Settings {
 
   def slickScalacSettings = Seq(
     scalacOptions ++= List("-deprecation", "-feature", "-unchecked", "-Xfuture"),
-    Compile / doc / scalacOptions ++= Seq(
-      "-doc-title", name.value,
-      "-doc-version", version.value,
-      "-doc-footer", "Slick is developed by Typesafe and EPFL Lausanne.",
-      "-sourcepath", (Compile / sourceDirectory).value.getPath, // needed for scaladoc to strip the location of the linked source path
-      "-doc-source-url", s"https://github.com/slick/slick/blob/${Docs.versionTag(version.value)}/slick/src/main€{FILE_PATH}.scala",
-      "-implicits",
-      "-diagrams", // requires graphviz
-      "-groups"
-    )
+//    Compile / doc / scalacOptions ++= Seq(
+//      "-doc-title", name.value,
+//      "-doc-version", version.value,
+//      "-doc-footer", "Slick is developed by Typesafe and EPFL Lausanne.",
+//      "-sourcepath", (Compile / sourceDirectory).value.getPath, // needed for scaladoc to strip the location of the linked source path
+//      "-doc-source-url", s"https://github.com/slick/slick/blob/${Docs.versionTag(version.value)}/slick/src/main€{FILE_PATH}.scala",
+//      "-implicits",
+//      "-diagrams", // requires graphviz
+//      "-groups"
+//    )
   )
 
   // set the scala-compiler dependency unless a local scala is in use
