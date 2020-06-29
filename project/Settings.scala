@@ -171,11 +171,11 @@ object Settings {
   )
 
   def aRootProjectSettings = (
-    skip in publish := true,
     slickGeneralSettings ++
       extTarget("root") ++
 //      Docs.docSettings ++
       Seq(
+        skip in publish := true,
         sourceDirectory := file(target.value + "/root-src"),
         publishArtifact := false,
         publish := {},
